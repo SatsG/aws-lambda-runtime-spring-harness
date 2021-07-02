@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.github.satsg.aws.lambda.runtime.spring.harness.config.EventHttpHandlerAutoConfiguration,\
+com.github.satsg.aws.lambda.runtime.spring.harness.config.EventRunnerAutoConfiguration,\
+com.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaEventLoopAutoConfiguration,\
+com.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaReactiveEventAutoConfiguration,\
+com.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaRuntimeNativeAutoConfiguration
