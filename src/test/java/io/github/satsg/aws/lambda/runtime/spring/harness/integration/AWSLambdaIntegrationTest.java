@@ -5,7 +5,6 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.config.TestConfig;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.ServerlessEventLoop;
 import io.github.satsg.aws.lambda.runtime.spring.harness.models.apigateway.v1.APIGatewayRequestV1;
-import io.github.satsg.aws.lambda.runtime.spring.harness.models.apigateway.v2.APIGatewayRequestV2;
 import io.github.satsg.aws.lambda.runtime.spring.harness.runner.EventLoopRunner;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,15 +52,7 @@ class AWSLambdaIntegrationTest {
     stopNextLoop();
     createEvent(createAPIGatewayV1Event());
     AWSLambdaCustomResponse response = getEventLoopResponse();
-    Assertions.assertThat(response.getBody()).isEqualTo("Bingus");
-  }
-
-  @Test
-  void apiGatewayEventV2() throws InterruptedException {
-    stopNextLoop();
-    createEvent(createAPIGatewayV2Event());
-    AWSLambdaCustomResponse response = getEventLoopResponse();
-    Assertions.assertThat(response.getBody()).isEqualTo("Bingus");
+    Assertions.assertThat(response.getBody()).isEqualTo("{\"property\":\"value\"}");
   }
 
   @AfterEach
@@ -71,10 +62,6 @@ class AWSLambdaIntegrationTest {
 
   private APIGatewayRequestV1 createAPIGatewayV1Event() {
     return loadEventFile("api-gateway-v1.json", APIGatewayRequestV1.class);
-  }
-
-  private APIGatewayRequestV2 createAPIGatewayV2Event() {
-    return loadEventFile("api-gateway-v2.json", APIGatewayRequestV2.class);
   }
 
   private <T> T loadEventFile(String filename, Class<T> clazz) {

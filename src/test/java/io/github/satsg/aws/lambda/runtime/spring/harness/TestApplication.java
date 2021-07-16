@@ -2,6 +2,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -135,6 +136,7 @@ class LambdaRuntimeController {
         RequestMethod.TRACE
       })
   public Mono<ResponseEntity<Object>> test(@RequestBody String body) {
-    return Mono.just(new ResponseEntity<>("\"Bingus\"", HttpStatus.OK));
+    return Mono.just(
+        new ResponseEntity<>(Collections.singletonMap("property", "value"), HttpStatus.OK));
   }
 }
