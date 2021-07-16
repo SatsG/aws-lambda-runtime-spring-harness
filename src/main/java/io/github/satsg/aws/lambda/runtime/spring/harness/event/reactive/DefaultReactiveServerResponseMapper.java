@@ -2,6 +2,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
@@ -20,7 +21,7 @@ public class DefaultReactiveServerResponseMapper implements ReactiveServerRespon
       AWSLambdaCustomResponse awsResponse = new AWSLambdaCustomResponse();
       awsResponse.setStatusCode(result.getStatusCode().value());
       awsResponse.setBody(
-          result.getBody() != null ? mapper.readValue(result.getBody(), Object.class) : null);
+          result.getBody() != null ? new String(result.getBody(), StandardCharsets.UTF_8) : null);
       awsResponse.setHeaders(result.getHeaders().toSingleValueMap());
       awsResponse.setIsBase64Encoded(false);
       return awsResponse;

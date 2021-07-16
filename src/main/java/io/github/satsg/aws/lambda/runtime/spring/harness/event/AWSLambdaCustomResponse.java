@@ -6,7 +6,7 @@ public class AWSLambdaCustomResponse {
   private int statusCode;
   private Map<String, String> headers;
   private boolean isBase64Encoded;
-  private Object body;
+  private String body;
 
   public AWSLambdaCustomResponse() {
     this.statusCode = 200;
@@ -39,11 +39,11 @@ public class AWSLambdaCustomResponse {
     this.isBase64Encoded = isBase64Encoded;
   }
 
-  public Object getBody() {
+  public String getBody() {
     return body;
   }
 
-  public void setBody(Object body) {
+  public void setBody(String body) {
     this.body = body;
   }
 }

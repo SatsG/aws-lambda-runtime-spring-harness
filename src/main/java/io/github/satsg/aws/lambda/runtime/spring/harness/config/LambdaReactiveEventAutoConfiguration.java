@@ -3,7 +3,6 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSEventHandler;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers.APIGatewayV1EventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers.APIGatewayV2EventMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.AWSReactiveEventHandler;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.AWSReactiveEventResolver;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.DefaultReactiveServerResponseCreator;
@@ -35,13 +34,6 @@ public class LambdaReactiveEventAutoConfiguration {
   public ReactiveEventMapper apiGatewayV1EventMapper(
       DataBufferFactory factory, ObjectMapper mapper) {
     return new APIGatewayV1EventMapper(factory, new DefaultUriBuilderFactory(), mapper);
-  }
-
-  @Bean
-  @Order
-  public ReactiveEventMapper apiGatewayV2EventMapper(
-      DataBufferFactory factory, ObjectMapper mapper) {
-    return new APIGatewayV2EventMapper(factory, new DefaultUriBuilderFactory(), mapper);
   }
 
   @Bean
