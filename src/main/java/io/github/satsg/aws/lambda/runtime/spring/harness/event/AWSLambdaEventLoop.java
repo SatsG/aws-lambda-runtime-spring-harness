@@ -41,7 +41,6 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
         processResponse(requestId, event.getBody());
       } catch (Exception e) {
         LOGGER.error("There was an issue retrieving the event.", e);
-        executeErrorProcedure(() -> runtime.sendErrorInit(eventErrorMapper.error(e)));
       }
     }
   }
@@ -60,7 +59,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
       createResponse(requestId, event);
     } catch (Exception e) {
       LOGGER.error("There was an issue responding to the event.", e);
-      runtime.sendErrorResponse(requestId, eventErrorMapper.error(e));
+      executeErrorProcedure(() -> runtime.sendErrorResponse(requestId, eventErrorMapper.error(e)));
     }
   }
 
