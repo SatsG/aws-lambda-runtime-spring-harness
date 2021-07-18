@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 @ConditionalOnProperty(value = "satsg.enable.aws.lambda.runtime.configuration")
 @Configuration
@@ -39,7 +40,9 @@ public class LambdaEventLoopAutoConfiguration {
   @Bean
   @ConditionalOnMissingBean(AWSLambdaRuntime.class)
   public AWSLambdaRuntime runtime(AWSLambdaUriBuilderFactory awsLambdaUriBuilderFactory) {
-    return new AWSLambdaRuntime(new RestTemplateBuilder().build(), awsLambdaUriBuilderFactory);
+    return new AWSLambdaRuntime(
+        new RestTemplateBuilder().requestFactory(SimpleClientHttpRequestFactory::new).build(),
+        awsLambdaUriBuilderFactory);
   }
 
   @Bean
