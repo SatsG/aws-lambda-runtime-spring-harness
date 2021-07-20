@@ -50,8 +50,8 @@ public class LambdaReactiveEventAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(ReactiveServerResponseMapper.class)
-  public ReactiveServerResponseMapper mapper(ObjectMapper mapper) {
-    return new DefaultReactiveServerResponseMapper(mapper);
+  public ReactiveServerResponseMapper mapper() {
+    return new DefaultReactiveServerResponseMapper();
   }
 
   @Bean
