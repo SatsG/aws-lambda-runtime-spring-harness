@@ -1,12 +1,12 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
-import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -22,7 +22,7 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
   private HttpStatus status;
   private final MultiValueMap<String, ResponseCookie> cookies;
   private final HttpHeaders headers;
-  private byte[] body;
+  private Flux<ByteBuffer> body;
 
   public ReactiveEventServerHttpResponse(DataBufferFactory factory) {
     this.factory = factory;
@@ -70,22 +70,13 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
 
   @Override
   public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    DataBufferUtils.write(Mono.from(body).map(buffer -> (DataBuffer) buffer), stream).blockLast();
-    this.body = stream.toByteArray();
+    this.body = Flux.from(body).map(DataBuffer::asByteBuffer);
     return Mono.empty();
   }
 
   @Override
   public Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> body) {
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    DataBufferUtils.write(
-            Flux.from(body)
-                .flatMap(publisher -> Mono.from(publisher).map(buffer -> (DataBuffer) buffer)),
-            stream)
-        .blockLast();
-    this.body = stream.toByteArray();
-    return Mono.empty();
+    return writeWith(Flux.from(body).flatMap(Function.identity()));
   }
 
   @Override
@@ -98,7 +89,7 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
     return headers;
   }
 
-  public byte[] getBody() {
+  public Flux<ByteBuffer> getBody() {
     return body;
   }
 }

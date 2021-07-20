@@ -1,18 +1,11 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
 public class DefaultReactiveServerResponseMapper implements ReactiveServerResponseMapper {
-
-  private final ObjectMapper mapper;
-
-  public DefaultReactiveServerResponseMapper(ObjectMapper mapper) {
-    this.mapper = Objects.requireNonNull(mapper);
-  }
 
   @Override
   public AWSLambdaCustomResponse response(ServerHttpResponse response) {
@@ -20,8 +13,12 @@ public class DefaultReactiveServerResponseMapper implements ReactiveServerRespon
       ReactiveEventServerHttpResponse result = (ReactiveEventServerHttpResponse) response;
       AWSLambdaCustomResponse awsResponse = new AWSLambdaCustomResponse();
       awsResponse.setStatusCode(result.getStatusCode().value());
-      awsResponse.setBody(
-          result.getBody() != null ? new String(result.getBody(), StandardCharsets.UTF_8) : null);
+      if (result.getBody() != null) {
+        ByteBuffer body = result.getBody().blockLast();
+        if (body != null) {
+          awsResponse.setBody(new String(body.array(), StandardCharsets.UTF_8));
+        }
+      }
       awsResponse.setHeaders(result.getHeaders().toSingleValueMap());
       awsResponse.setIsBase64Encoded(false);
       return awsResponse;
