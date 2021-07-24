@@ -1,7 +1,9 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
@@ -23,6 +25,7 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
   private final MultiValueMap<String, ResponseCookie> cookies;
   private final HttpHeaders headers;
   private Flux<ByteBuffer> body;
+  private final List<Supplier<? extends Mono<Void>>> actions;
 
   public ReactiveEventServerHttpResponse(DataBufferFactory factory) {
     this.factory = factory;
@@ -30,6 +33,7 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
     this.headers = new HttpHeaders();
     this.cookies = new MultiValueMapAdapter<>(new HashMap<>());
     this.body = null;
+    this.actions = new ArrayList<>();
   }
 
   @Override
@@ -60,7 +64,7 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
 
   @Override
   public void beforeCommit(Supplier<? extends Mono<Void>> action) {
-    action.get().block();
+    actions.add(action);
   }
 
   @Override
@@ -91,5 +95,9 @@ public class ReactiveEventServerHttpResponse implements ServerHttpResponse {
 
   public Flux<ByteBuffer> getBody() {
     return body;
+  }
+
+  public List<Supplier<? extends Mono<Void>>> getActions() {
+    return actions;
   }
 }
