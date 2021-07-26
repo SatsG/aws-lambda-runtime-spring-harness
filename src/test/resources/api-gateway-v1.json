@@ -16,7 +16,9 @@
     "X-Amzn-Trace-Id": "Root=1-5e66d96f-7491f09xmpl79d18acf3d050",
     "X-Forwarded-For": "52.255.255.12",
     "X-Forwarded-Port": "443",
-    "X-Forwarded-Proto": "https"
+    "X-Forwarded-Proto": "https",
+    "Custom-1": null,
+    "Custom-2": ""
   },
   "multiValueHeaders": {
     "accept": [
@@ -62,8 +64,19 @@
       "https"
     ]
   },
-  "queryStringParameters": null,
-  "multiValueQueryStringParameters": null,
+  "queryStringParameters": {
+    "twitch": "",
+    "youtube": "UC-hM6YJuNYVAmUWxeIr9FeA",
+    "twitter": null
+  },
+  "multiValueQueryStringParameters": {
+    "twitch": [
+      ""
+    ],
+    "youtube": [
+      "UC-hM6YJuNYVAmUWxeIr9FeA"
+    ]
+  },
   "pathParameters": null,
   "stageVariables": null,
   "requestContext": {
