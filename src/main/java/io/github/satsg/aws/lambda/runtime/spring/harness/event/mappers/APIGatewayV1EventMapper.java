@@ -7,7 +7,6 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.Reactive
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -80,18 +79,18 @@ public class APIGatewayV1EventMapper implements ReactiveEventMapper {
   }
 
   private void addQueryParams(Map<String, Object> event, MultiValueMap<String, String> query) {
-    addMultiValueSources(event.get("multiValueQueryStringParameters"), query);
+    addSingleValueSources(event.get("queryStringParameters"), query);
   }
 
   private void addHeaders(Map<String, Object> event, MultiValueMap<String, String> headers) {
-    addMultiValueSources(event.get("multiValueHeaders"), headers);
+    addSingleValueSources(event.get("headers"), headers);
   }
 
-  private void addMultiValueSources(
-      Object multipleSource, MultiValueMap<String, String> destination) {
-    if (multipleSource != null) {
-      Map<String, List<String>> multiSourceValues = (Map<String, List<String>>) multipleSource;
-      multiSourceValues.forEach(destination::addAll);
+  private void addSingleValueSources(
+      Object singleSource, MultiValueMap<String, String> destination) {
+    if (singleSource != null) {
+      Map<String, String> singleSourceValues = (Map<String, String>) singleSource;
+      singleSourceValues.forEach(destination::add);
     }
   }
 

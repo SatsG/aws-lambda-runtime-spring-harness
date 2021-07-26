@@ -89,7 +89,7 @@ public class ReactiveEventServerHttpRequest implements ServerHttpRequest {
     if (uri.getQuery() != null) {
       Stream.of(uri.getQuery().split("&"))
           .map(params -> params.split("="))
-          .forEach(pair -> result.add(pair[0], pair[1]));
+          .forEach(pair -> result.add(pair[0], pair.length == 2 ? pair[1] : ""));
     }
     return result;
   }
