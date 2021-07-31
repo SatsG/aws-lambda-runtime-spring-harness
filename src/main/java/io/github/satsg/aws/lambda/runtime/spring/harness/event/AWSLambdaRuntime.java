@@ -28,9 +28,9 @@ public class AWSLambdaRuntime {
     this(
         client,
         factory.builder().path("/runtime/invocation/next").build().toString(),
-        factory.builder().build().toString() + "/runtime/invocation/{id}/response",
+        factory.builder().build() + "/runtime/invocation/{id}/response",
         factory.builder().path("/runtime/init/error").build().toString(),
-        factory.builder().build().toString() + "/runtime/invocation/{id}/error");
+        factory.builder().build() + "/runtime/invocation/{id}/error");
   }
 
   private AWSLambdaRuntime(

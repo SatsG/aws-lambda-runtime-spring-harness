@@ -44,12 +44,19 @@ class AWSLambdaIntegrationTest {
 
   @BeforeEach
   void setUpEach(@Autowired ServerlessEventLoop eventLoop) {
-    start(eventLoop);
+    eventRunner =
+        CompletableFuture.runAsync(
+            () -> {
+              try {
+                new EventLoopRunner(eventLoop).run();
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            });
   }
 
   @Test
   void apiGatewayEventV1() throws InterruptedException {
-    stopNextLoop();
     createEvent(createAPIGatewayV1Event());
     AWSLambdaCustomResponse response = getEventLoopResponse();
     Assertions.assertThat(response.getBody()).isEqualTo("{\"property\":\"value\"}");
@@ -93,22 +100,5 @@ class AWSLambdaIntegrationTest {
     }
 
     return response != null ? response.getBody() : Assertions.fail("Unable to pull event");
-  }
-
-  private void start(ServerlessEventLoop eventLoop) {
-    System.setProperty(TestConfig.EVENT_LOOP_CONDITION_PROP, "true");
-    eventRunner =
-        CompletableFuture.runAsync(
-            () -> {
-              try {
-                new EventLoopRunner(eventLoop).run();
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            });
-  }
-
-  private void stopNextLoop() {
-    System.setProperty(TestConfig.EVENT_LOOP_CONDITION_PROP, "false");
   }
 }

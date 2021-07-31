@@ -7,10 +7,24 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class TestConfig {
 
-  public static final String EVENT_LOOP_CONDITION_PROP = "event.loop.continue";
-
   @Bean
   public LoopCondition condition() {
-    return () -> Boolean.parseBoolean(System.getProperty(EVENT_LOOP_CONDITION_PROP));
+    return new BoundedLoop(1);
+  }
+
+  public static class BoundedLoop implements LoopCondition {
+
+    private int loops = 0;
+    private final int bound;
+
+    public BoundedLoop(int bound) {
+      assert bound >= 0;
+      this.bound = bound;
+    }
+
+    @Override
+    public boolean shouldContinue() {
+      return loops++ < bound;
+    }
   }
 }

@@ -37,7 +37,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
         ResponseEntity<Object> event = getEvent();
         String requestId =
             event.getHeaders().getFirst(AWSLambdaRuntime.LAMBDA_RUNTIME_REQUEST_ID_HEADER);
-        LOGGER.info("Processing event (" + requestId + ")");
+        LOGGER.info("Processing event: " + requestId);
         processResponse(requestId, event.getBody());
       } catch (Exception e) {
         LOGGER.error("There was an issue retrieving the event.", e);
@@ -46,7 +46,6 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
   }
 
   private ResponseEntity<Object> getEvent() throws JsonProcessingException {
-    LOGGER.info("Listening for event.");
     ResponseEntity<Object> event = runtime.getEvent();
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Received event: " + mapper.writeValueAsString(event.getBody()));
@@ -69,7 +68,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
       LOGGER.debug("Attempting to respond with: " + mapper.writeValueAsString(response));
     }
     runtime.sendResponse(requestId, response);
-    LOGGER.info("Responded to event (" + requestId + ")");
+    LOGGER.info("Responded to event: " + requestId);
   }
 
   private void executeErrorProcedure(Runnable proc) {
