@@ -63,7 +63,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
   }
 
   private void createResponse(String requestId, Object event) throws JsonProcessingException {
-    AWSLambdaCustomResponse response = handler.handle(event);
+    Object response = handler.handle(event);
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Attempting to respond with: " + mapper.writeValueAsString(response));
     }

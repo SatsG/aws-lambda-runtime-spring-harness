@@ -1,9 +1,13 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpRequest;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpResponse;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,19 +16,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.assertj.core.data.MapEntry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import reactor.core.publisher.Flux;
 
+@ExtendWith(MockitoExtension.class)
 class APIGatewayV1EventMapperTest {
 
   private static final APIGatewayV1EventMapper EVENT_MAPPER =
@@ -59,7 +73,7 @@ class APIGatewayV1EventMapperTest {
   }
 
   @Nested
-  class MapperTest {
+  class ComposeTest {
 
     @Test
     void requestIsDefaultReactiveType() {
@@ -168,6 +182,64 @@ class APIGatewayV1EventMapperTest {
               new String(
                   request.getBody().blockLast().asByteBuffer().array(), StandardCharsets.UTF_8))
           .isEqualTo("{\"property\":\"value\"}");
+    }
+  }
+
+  @Nested
+  class CreateTest {
+
+    @Test
+    void isReactiveEventServerHttpResponse() {
+      assertThat(EVENT_MAPPER.create()).isInstanceOf(ReactiveEventServerHttpResponse.class);
+    }
+  }
+
+  @Nested
+  class ResponseTest {
+
+    @Mock private ReactiveEventServerHttpResponse response;
+
+    @BeforeEach
+    void setUpEach() {
+      given(response.getStatusCode()).willReturn(HttpStatus.OK);
+      given(response.getHeaders())
+          .willReturn(
+              new HttpHeaders(
+                  new MultiValueMapAdapter<>(Map.of("h1", Collections.singletonList("value1")))));
+    }
+
+    @Test
+    void statusIsCorrect() {
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) EVENT_MAPPER.respond(response);
+      assertThat(result.getStatusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void notBase64Decoded() {
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) EVENT_MAPPER.respond(response);
+      assertThat(result.getIsBase64Encoded()).isFalse();
+    }
+
+    @Test
+    void headersAreCorrect() {
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) EVENT_MAPPER.respond(response);
+      assertThat(result.getHeaders()).containsExactly(MapEntry.entry("h1", "value1"));
+    }
+
+    @Test
+    void bodyIsCorrect() {
+      given(response.getBody())
+          .willReturn(
+              Flux.just(
+                  ByteBuffer.wrap("{\"property\":\"value\"}".getBytes(StandardCharsets.UTF_8))));
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) EVENT_MAPPER.respond(response);
+      assertThat(result.getBody()).isEqualTo("{\"property\":\"value\"}");
+    }
+
+    @Test
+    void bodyIsNullWhenNotPresent() {
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) EVENT_MAPPER.respond(response);
+      assertThat(result.getBody()).isNull();
     }
   }
 

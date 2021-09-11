@@ -15,9 +15,6 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.event.EventErrorMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.LoopCondition;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.ServerlessEventLoop;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventResolver;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveServerResponseCreator;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveServerResponseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -216,15 +213,6 @@ public class ApplicationContextTest {
               assertThat(ctx)
                   .getBean("apiGatewayV1EventMapper")
                   .isInstanceOf(ReactiveEventMapper.class);
-
-              assertThat(ctx).hasBean("resolver");
-              assertThat(ctx).getBean("resolver").isInstanceOf(ReactiveEventResolver.class);
-
-              assertThat(ctx).hasBean("creator");
-              assertThat(ctx).getBean("creator").isInstanceOf(ReactiveServerResponseCreator.class);
-
-              assertThat(ctx).hasBean("mapper");
-              assertThat(ctx).getBean("mapper").isInstanceOf(ReactiveServerResponseMapper.class);
 
               assertThat(ctx).hasBean("handler");
               assertThat(ctx).getBean("handler").isInstanceOf(AWSEventHandler.class);

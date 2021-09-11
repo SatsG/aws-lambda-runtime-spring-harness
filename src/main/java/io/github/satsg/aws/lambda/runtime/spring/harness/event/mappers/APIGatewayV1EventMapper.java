@@ -1,7 +1,10 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers;
 
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpRequest;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpResponse;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.util.UriBuilder;
@@ -69,6 +73,31 @@ public class APIGatewayV1EventMapper implements ReactiveEventMapper {
           dataBufferFactory, requestId, method, requestUriBuilder.build(), headers, body);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to convert api gateway v1 event to a request", e);
+    }
+  }
+
+  @Override
+  public ServerHttpResponse create() {
+    return new ReactiveEventServerHttpResponse(dataBufferFactory);
+  }
+
+  @Override
+  public Object respond(ServerHttpResponse response) {
+    try {
+      ReactiveEventServerHttpResponse result = (ReactiveEventServerHttpResponse) response;
+      AWSLambdaCustomResponse awsResponse = new AWSLambdaCustomResponse();
+      awsResponse.setStatusCode(result.getStatusCode().value());
+      if (result.getBody() != null) {
+        ByteBuffer body = result.getBody().blockLast();
+        if (body != null) {
+          awsResponse.setBody(new String(body.array(), StandardCharsets.UTF_8));
+        }
+      }
+      awsResponse.setHeaders(result.getHeaders().toSingleValueMap());
+      awsResponse.setIsBase64Encoded(false);
+      return awsResponse;
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to convert server response to lambda response.", e);
     }
   }
 

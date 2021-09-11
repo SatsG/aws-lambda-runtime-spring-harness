@@ -50,7 +50,7 @@ public class AWSLambdaRuntime {
     return client.getForEntity(nextEndpoint, Object.class);
   }
 
-  public void sendResponse(String requestId, AWSLambdaCustomResponse response) {
+  public void sendResponse(String requestId, Object response) {
     client.postForObject(responseEndpointPattern, response, Object.class, requestId);
   }
 

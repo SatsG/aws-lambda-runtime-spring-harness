@@ -1,13 +1,15 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
+import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.server.reactive.HttpHandler;
@@ -18,47 +20,57 @@ import reactor.core.publisher.Mono;
 @ExtendWith(MockitoExtension.class)
 class AWSReactiveEventHandlerTest {
 
+  @Mock private ReactiveEventMapper mapper1;
+  @Mock private ReactiveEventMapper mapper2;
   @Mock private ServerHttpRequest request;
   @Mock private ServerHttpResponse response;
-  @Mock private AWSLambdaCustomResponse awsResponse;
 
-  @Mock private ReactiveEventResolver resolver;
-  @Mock private ReactiveServerResponseCreator creator;
   @Mock private HttpHandler httpHandler;
-  @Mock private ReactiveServerResponseMapper mapper;
 
-  @InjectMocks private AWSReactiveEventHandler handler;
+  private AWSReactiveEventHandler handler;
 
-  @Test
-  void resolverIsUsed() {
-    callHandler(request, response, awsResponse);
-    verify(resolver).resolve(any());
+  @BeforeEach
+  void setUpEach() {
+    handler = new AWSReactiveEventHandler(Arrays.asList(mapper1, mapper2), httpHandler);
   }
 
   @Test
-  void creatorIsUsed() {
-    callHandler(request, response, awsResponse);
-    verify(creator).create();
+  void correctResolverIsUsed() {
+    callHandler(request, response);
+    verify(mapper1, never()).compose(any());
+    verify(mapper2).compose(any());
+  }
+
+  @Test
+  void correctCreateIsUsed() {
+    callHandler(request, response);
+    verify(mapper1, never()).create();
+    verify(mapper2).create();
   }
 
   @Test
   void httpHandlerIsUsed() {
-    callHandler(request, response, awsResponse);
+    callHandler(request, response);
     verify(httpHandler).handle(request, response);
   }
 
   @Test
-  void mapperIsUsed() {
-    callHandler(request, response, awsResponse);
-    verify(mapper).response(response);
+  void throwExceptionWhenNoMatches() {
+    given(mapper1.matches(any())).willReturn(false);
+    given(mapper2.matches(any())).willReturn(false);
+
+    assertThatThrownBy(() -> handler.handle(new Object()))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Event doesn't match any supported mappings.");
   }
 
-  private void callHandler(
-      ServerHttpRequest request, ServerHttpResponse response, AWSLambdaCustomResponse awsResponse) {
-    given(resolver.resolve(any())).willReturn(request);
-    given(creator.create()).willReturn(response);
+  private void callHandler(ServerHttpRequest request, ServerHttpResponse response) {
+    given(mapper1.matches(any())).willReturn(false);
+    given(mapper2.matches(any())).willReturn(true);
+    given(mapper2.compose(any())).willReturn(request);
+    given(mapper2.respond(response)).willReturn(new Object());
+    given(mapper2.create()).willReturn(response);
     given(httpHandler.handle(request, response)).willReturn(Mono.empty());
-    given(mapper.response(response)).willReturn(awsResponse);
 
     handler.handle(new Object());
   }
