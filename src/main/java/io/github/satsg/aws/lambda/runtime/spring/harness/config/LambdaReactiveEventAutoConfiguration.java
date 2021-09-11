@@ -3,13 +3,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.config;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSEventHandler;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers.APIGatewayV1EventMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.AWSReactiveEventHandler;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.AWSReactiveEventResolver;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.DefaultReactiveServerResponseCreator;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.DefaultReactiveServerResponseMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventResolver;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveServerResponseCreator;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveServerResponseMapper;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,30 +29,8 @@ public class LambdaReactiveEventAutoConfiguration {
   }
 
   @Bean
-  @ConditionalOnMissingBean(ReactiveEventResolver.class)
-  public ReactiveEventResolver resolver(List<ReactiveEventMapper> mappers) {
-    return new AWSReactiveEventResolver(mappers);
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(ReactiveServerResponseCreator.class)
-  public ReactiveServerResponseCreator creator(DataBufferFactory factory) {
-    return new DefaultReactiveServerResponseCreator(factory);
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(ReactiveServerResponseMapper.class)
-  public ReactiveServerResponseMapper mapper() {
-    return new DefaultReactiveServerResponseMapper();
-  }
-
-  @Bean
   @ConditionalOnMissingBean(AWSEventHandler.class)
-  public AWSEventHandler handler(
-      ReactiveEventResolver resolver,
-      ReactiveServerResponseCreator creator,
-      HttpHandler httpHandler,
-      ReactiveServerResponseMapper mapper) {
-    return new AWSReactiveEventHandler(resolver, creator, httpHandler, mapper);
+  public AWSEventHandler handler(List<ReactiveEventMapper> mappers, HttpHandler httpHandler) {
+    return new AWSReactiveEventHandler(mappers, httpHandler);
   }
 }
