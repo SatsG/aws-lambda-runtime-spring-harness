@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
 public class AWSLambdaEventLoop implements ServerlessEventLoop {
@@ -38,7 +39,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
         String requestId =
             event.getHeaders().getFirst(AWSLambdaRuntime.LAMBDA_RUNTIME_REQUEST_ID_HEADER);
         LOGGER.info("Processing event: " + requestId);
-        processResponse(requestId, event.getBody());
+        processResponse(requestId, event.getBody(), event.getHeaders());
       } catch (Exception e) {
         LOGGER.error("There was an issue retrieving the event.", e);
       }
@@ -53,17 +54,18 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
     return event;
   }
 
-  private void processResponse(String requestId, Object event) {
+  private void processResponse(String requestId, Object event, HttpHeaders headers) {
     try {
-      createResponse(requestId, event);
+      createResponse(requestId, event, headers);
     } catch (Exception e) {
       LOGGER.error("There was an issue responding to the event.", e);
       executeErrorProcedure(() -> runtime.sendErrorResponse(requestId, eventErrorMapper.error(e)));
     }
   }
 
-  private void createResponse(String requestId, Object event) throws JsonProcessingException {
-    Object response = handler.handle(event);
+  private void createResponse(String requestId, Object event, HttpHeaders headers)
+      throws JsonProcessingException {
+    Object response = handler.handle(event, headers);
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Attempting to respond with: " + mapper.writeValueAsString(response));
     }

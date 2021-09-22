@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
@@ -49,7 +49,7 @@ public class APIGatewayV1EventMapper implements ReactiveEventMapper {
   }
 
   @Override
-  public ServerHttpRequest compose(Object event) {
+  public ServerHttpRequest compose(Object event, Map<String, List<String>> headers) {
     try {
       Map<String, Object> eventMap = (Map<String, Object>) event;
       Map<String, Object> context = (Map<String, Object>) eventMap.get("requestContext");
@@ -61,8 +61,8 @@ public class APIGatewayV1EventMapper implements ReactiveEventMapper {
       MultiValueMap<String, String> query = new MultiValueMapAdapter<>(new HashMap<>());
       addQueryParams(eventMap, query);
 
-      HttpHeaders headers = new HttpHeaders();
-      addHeaders(eventMap, headers);
+      HttpHeaders requestHeaders = new HttpHeaders();
+      addHeaders(eventMap, requestHeaders);
 
       UriBuilder requestUriBuilder = uriBuilderFactory.builder().path(path);
       query.forEach(requestUriBuilder::queryParam);
@@ -70,7 +70,7 @@ public class APIGatewayV1EventMapper implements ReactiveEventMapper {
       byte[] body = getBody(eventMap.get("body"), (Boolean) eventMap.get("isBase64Encoded"));
 
       return new ReactiveEventServerHttpRequest(
-          dataBufferFactory, requestId, method, requestUriBuilder.build(), headers, body);
+          dataBufferFactory, requestId, method, requestUriBuilder.build(), requestHeaders, body);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to convert api gateway v1 event to a request", e);
     }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.EventHttpHandlerAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.EventRunnerAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaEventLoopAutoConfiguration;
+import io.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaFunctionalEventAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaReactiveEventAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSEventHandler;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
@@ -14,16 +15,26 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaUriBuild
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.EventErrorMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.LoopCondition;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.ServerlessEventLoop;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionInputMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionNameResolver;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionOutputMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.function.context.FunctionCatalog;
+import org.springframework.cloud.function.context.catalog.SimpleFunctionRegistry;
+import org.springframework.cloud.function.json.JacksonMapper;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.server.reactive.HttpHandler;
+import org.springframework.messaging.converter.CompositeMessageConverter;
+import org.springframework.messaging.converter.SimpleMessageConverter;
 import org.springframework.web.reactive.DispatcherHandler;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
@@ -172,7 +183,8 @@ public class ApplicationContextTest {
             "satsg.enable.aws.lambda.runtime.configuration=true",
             "AWS_LAMBDA_RUNTIME_API=localhost:9090",
             "satsg.aws.lambda.runtime.version=2018-06-01")
-        .withBean(AWSEventHandler.class, () -> ignored -> new AWSLambdaCustomResponse())
+        .withBean(
+            AWSEventHandler.class, () -> (ignored1, ignored2) -> new AWSLambdaCustomResponse())
         .withBean(ObjectMapper.class, ObjectMapper::new)
         .run(
             ctx -> {
@@ -213,6 +225,38 @@ public class ApplicationContextTest {
               assertThat(ctx)
                   .getBean("apiGatewayV1EventMapper")
                   .isInstanceOf(ReactiveEventMapper.class);
+
+              assertThat(ctx).hasBean("handler");
+              assertThat(ctx).getBean("handler").isInstanceOf(AWSEventHandler.class);
+            });
+  }
+
+  @Test
+  void functionalEventConfigurationIsRegistered() {
+    context
+        .withUserConfiguration(LambdaFunctionalEventAutoConfiguration.class)
+        .withPropertyValues(
+            "satsg.enable.aws.lambda.runtime.configuration=true",
+            "satsg.enable.aws.lambda.runtime.functional=true")
+        .withBean(ObjectMapper.class, ObjectMapper::new)
+        .withBean(
+            FunctionCatalog.class,
+            () ->
+                new SimpleFunctionRegistry(
+                    new ApplicationConversionService(),
+                    new CompositeMessageConverter(
+                        Collections.singletonList(new SimpleMessageConverter())),
+                    new JacksonMapper(new ObjectMapper())))
+        .run(
+            ctx -> {
+              assertThat(ctx).hasBean("resolver");
+              assertThat(ctx).getBean("resolver").isInstanceOf(FunctionNameResolver.class);
+
+              assertThat(ctx).hasBean("inputMapper");
+              assertThat(ctx).getBean("inputMapper").isInstanceOf(FunctionInputMapper.class);
+
+              assertThat(ctx).hasBean("outputMapper");
+              assertThat(ctx).getBean("outputMapper").isInstanceOf(FunctionOutputMapper.class);
 
               assertThat(ctx).hasBean("handler");
               assertThat(ctx).getBean("handler").isInstanceOf(AWSEventHandler.class);

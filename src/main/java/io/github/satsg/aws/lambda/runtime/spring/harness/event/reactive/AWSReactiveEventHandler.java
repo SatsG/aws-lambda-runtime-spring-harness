@@ -2,6 +2,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSEventHandler;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,9 +19,9 @@ public class AWSReactiveEventHandler implements AWSEventHandler {
   }
 
   @Override
-  public Object handle(Object event) {
+  public Object handle(Object event, Map<String, List<String>> headers) {
     ReactiveEventMapper mapper = resolve(event);
-    ServerHttpRequest request = mapper.compose(event);
+    ServerHttpRequest request = mapper.compose(event, headers);
     ServerHttpResponse response = mapper.create();
     httpHandler.handle(request, response).block();
     return mapper.respond(response);
