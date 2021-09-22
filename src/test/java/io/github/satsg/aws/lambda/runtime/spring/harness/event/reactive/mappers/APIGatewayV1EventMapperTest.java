@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -77,7 +77,7 @@ class APIGatewayV1EventMapperTest {
 
     @Test
     void requestIsDefaultReactiveType() {
-      ServerHttpRequest request = EVENT_MAPPER.compose(minimalEvent());
+      ServerHttpRequest request = EVENT_MAPPER.compose(minimalEvent(), Map.of());
       assertThat(request).isInstanceOf(ReactiveEventServerHttpRequest.class);
     }
 
@@ -85,7 +85,7 @@ class APIGatewayV1EventMapperTest {
     void methodIsSetCorrectly() {
       Map<String, Object> event = minimalEvent();
       event.put("httpMethod", "POST");
-      ServerHttpRequest request = EVENT_MAPPER.compose(event);
+      ServerHttpRequest request = EVENT_MAPPER.compose(event, Map.of());
       assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
     }
 
@@ -93,7 +93,7 @@ class APIGatewayV1EventMapperTest {
     void pathIsSetCorrectly() {
       Map<String, Object> event = minimalEvent();
       event.put("path", "/path");
-      ServerHttpRequest request = EVENT_MAPPER.compose(event);
+      ServerHttpRequest request = EVENT_MAPPER.compose(event, Map.of());
       assertThat(request.getPath()).isEqualTo(RequestPath.parse("/path", ""));
     }
 
@@ -113,7 +113,7 @@ class APIGatewayV1EventMapperTest {
                   "q4",
                   Arrays.asList("value1", "value2"))));
 
-      ServerHttpRequest request = EVENT_MAPPER.compose(event);
+      ServerHttpRequest request = EVENT_MAPPER.compose(event, Map.of());
 
       assertThat(request.getQueryParams()).containsKey("q1");
       assertThat(request.getQueryParams().get("q1")).containsExactly("value1");
@@ -141,7 +141,7 @@ class APIGatewayV1EventMapperTest {
                   "h4",
                   Arrays.asList("value1", "value2"))));
 
-      ServerHttpRequest request = EVENT_MAPPER.compose(event);
+      ServerHttpRequest request = EVENT_MAPPER.compose(event, Map.of());
 
       assertThat(request.getHeaders()).containsKey("h1");
       assertThat(request.getHeaders().get("h1")).containsExactly("value1");
@@ -159,7 +159,7 @@ class APIGatewayV1EventMapperTest {
       event.put("body", "{\"property\":\"value\"}");
       event.put("isBase64Encoded", false);
       ReactiveEventServerHttpRequest request =
-          (ReactiveEventServerHttpRequest) EVENT_MAPPER.compose(event);
+          (ReactiveEventServerHttpRequest) EVENT_MAPPER.compose(event, Map.of());
       assertThat(
               new String(
                   request.getBody().blockLast().asByteBuffer().array(), StandardCharsets.UTF_8))
@@ -177,7 +177,7 @@ class APIGatewayV1EventMapperTest {
               StandardCharsets.UTF_8));
       event.put("isBase64Encoded", true);
       ReactiveEventServerHttpRequest request =
-          (ReactiveEventServerHttpRequest) EVENT_MAPPER.compose(event);
+          (ReactiveEventServerHttpRequest) EVENT_MAPPER.compose(event, Map.of());
       assertThat(
               new String(
                   request.getBody().blockLast().asByteBuffer().array(), StandardCharsets.UTF_8))

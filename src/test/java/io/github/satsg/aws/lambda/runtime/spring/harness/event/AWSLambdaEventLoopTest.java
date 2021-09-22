@@ -5,7 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.config.TestConfig;
+import io.github.satsg.aws.lambda.runtime.spring.harness.integration.config.TestConfig;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -48,7 +48,7 @@ class AWSLambdaEventLoopTest {
     @Test
     void successfulHandlingSendsResponse() {
       AWSLambdaCustomResponse response = new AWSLambdaCustomResponse();
-      given(handler.handle(EVENT_ENTITY.getBody())).willReturn(response);
+      given(handler.handle(EVENT_ENTITY.getBody(), EVENT_ENTITY.getHeaders())).willReturn(response);
       eventLoop.run();
       verify(runtime).sendResponse("request-id", response);
     }
@@ -58,7 +58,7 @@ class AWSLambdaEventLoopTest {
       RuntimeException exception = new RuntimeException("Whoops!");
       AWSLambdaErrorResponse errorResponse = new AWSLambdaErrorResponse();
 
-      given(handler.handle(EVENT_ENTITY.getBody())).willThrow(exception);
+      given(handler.handle(EVENT_ENTITY.getBody(), EVENT_ENTITY.getHeaders())).willThrow(exception);
       given(eventErrorMapper.error(exception)).willReturn(errorResponse);
 
       eventLoop.run();
@@ -79,7 +79,7 @@ class AWSLambdaEventLoopTest {
     @Test
     void successfulHandlingSendsResponseTheCorrectAmountOfTimes() {
       AWSLambdaCustomResponse response = new AWSLambdaCustomResponse();
-      given(handler.handle(EVENT_ENTITY.getBody())).willReturn(response);
+      given(handler.handle(EVENT_ENTITY.getBody(), EVENT_ENTITY.getHeaders())).willReturn(response);
       eventLoop.run();
       verify(runtime, times(2)).sendResponse("request-id", response);
     }
