@@ -1,13 +1,12 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.config;
 
-import java.util.Objects;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.autoconfigure.web.reactive.HttpHandlerAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.web.reactive.config.WebFluxConfigurationSupport;
-import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 
 @ConditionalOnProperty(
     value = {
@@ -17,10 +16,16 @@ import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 @Configuration
 public class EventHttpHandlerAutoConfiguration extends WebFluxConfigurationSupport {
 
-  @Bean
-  @ConditionalOnMissingBean(HttpHandler.class)
-  public HttpHandler httpHandler() {
-    return WebHttpHandlerBuilder.applicationContext(Objects.requireNonNull(getApplicationContext()))
-        .build();
+  @Configuration
+  public static class HandlerAutoConfiguration extends HttpHandlerAutoConfiguration {}
+
+  @Configuration
+  public static class ReactiveAutoConfiguration extends WebFluxAutoConfiguration {}
+
+  @Configuration
+  public static class ErrorAutoConfiguration extends ErrorWebFluxAutoConfiguration {
+    public ErrorAutoConfiguration(ServerProperties serverProperties) {
+      super(serverProperties);
+    }
   }
 }
