@@ -3,6 +3,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.config.EventFunctionCatalogAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.EventHttpHandlerAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.EventRunnerAutoConfiguration;
 import io.github.satsg.aws.lambda.runtime.spring.harness.config.LambdaEventLoopAutoConfiguration;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
+import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.cloud.function.context.FunctionCatalog;
 import org.springframework.cloud.function.context.catalog.SimpleFunctionRegistry;
 import org.springframework.cloud.function.json.JacksonMapper;
@@ -56,6 +59,20 @@ import reactor.core.publisher.Mono;
 public class ApplicationContextTest {
 
   private final ApplicationContextRunner context = new ApplicationContextRunner();
+
+  @Test
+  void functionalDependenciesAreRegistered() {
+    context
+        .withUserConfiguration(EventFunctionCatalogAutoConfiguration.class)
+        .withPropertyValues(
+            "satsg.enable.aws.lambda.runtime.configuration=true",
+            "satsg.enable.aws.lambda.runtime.functional=true")
+        .run(
+            ctx -> {
+              assertThat(ctx).hasBean("functionCatalog");
+              assertThat(ctx).getBean("functionCatalog").isInstanceOf(FunctionCatalog.class);
+            });
+  }
 
   @Test
   void reactiveDependenciesAreRegistered() {
@@ -159,6 +176,14 @@ public class ApplicationContextTest {
               assertThat(ctx)
                   .getBean("serverResponseResultHandler")
                   .isInstanceOf(ServerResponseResultHandler.class);
+
+              assertThat(ctx).hasBean("errorWebExceptionHandler");
+              assertThat(ctx)
+                  .getBean("errorWebExceptionHandler")
+                  .isInstanceOf(ErrorWebExceptionHandler.class);
+
+              assertThat(ctx).hasBean("errorAttributes");
+              assertThat(ctx).getBean("errorAttributes").isInstanceOf(DefaultErrorAttributes.class);
             });
   }
 
