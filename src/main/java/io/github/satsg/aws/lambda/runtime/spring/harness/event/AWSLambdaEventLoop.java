@@ -50,6 +50,7 @@ public class AWSLambdaEventLoop implements ServerlessEventLoop {
     ResponseEntity<Object> event = runtime.getEvent();
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Received event: " + mapper.writeValueAsString(event.getBody()));
+      LOGGER.debug("Received headers: " + mapper.writeValueAsString(event.getHeaders()));
     }
     return event;
   }
