@@ -1,16 +1,19 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event;
 
+import java.util.List;
 import java.util.Map;
 
 public class AWSLambdaCustomResponse {
   private int statusCode;
   private Map<String, String> headers;
+  private Map<String, List<String>> multiValueHeaders;
   private boolean isBase64Encoded;
   private String body;
 
   public AWSLambdaCustomResponse() {
     this.statusCode = 200;
     this.headers = null;
+    this.multiValueHeaders = null;
     this.isBase64Encoded = false;
     this.body = null;
   }
@@ -29,6 +32,14 @@ public class AWSLambdaCustomResponse {
 
   public void setHeaders(Map<String, String> headers) {
     this.headers = headers;
+  }
+
+  public Map<String, List<String>> getMultiValueHeaders() {
+    return multiValueHeaders;
+  }
+
+  public void setMultiValueHeaders(Map<String, List<String>> multiValueHeaders) {
+    this.multiValueHeaders = multiValueHeaders;
   }
 
   public boolean getIsBase64Encoded() {

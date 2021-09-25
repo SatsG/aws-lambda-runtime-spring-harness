@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.BeforeEach;
@@ -184,6 +185,13 @@ abstract class BaseHttpEventMapperTest {
     void headersAreCorrect() {
       AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) getMapper().respond(response);
       assertThat(result.getHeaders()).containsExactly(MapEntry.entry("h1", "value1"));
+    }
+
+    @Test
+    void multiHeadersAreCorrect() {
+      AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) getMapper().respond(response);
+      assertThat(result.getMultiValueHeaders())
+          .containsExactly(MapEntry.entry("h1", List.of("value1")));
     }
 
     @Test
