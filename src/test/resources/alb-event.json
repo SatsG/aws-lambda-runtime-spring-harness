@@ -1,0 +1,57 @@
+{
+  "requestContext": {
+    "elb": {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-west-1:9999999999999:targetgroup/my-alb-target-group/999F99FF9F999F99"
+    }
+  },
+  "httpMethod": "GET",
+  "path": "/test",
+  "multiValueQueryStringParameters": {
+    "token": [
+      "moo,loo"
+    ]
+  },
+  "multiValueHeaders": {
+    "accept": [
+      "application/json"
+    ],
+    "accept-encoding": [
+      "gzip, deflate, br"
+    ],
+    "cache-control": [
+      "no-cache"
+    ],
+    "connection": [
+      "keep-alive"
+    ],
+    "content-length": [
+      "15"
+    ],
+    "content-type": [
+      "application/json"
+    ],
+    "host": [
+      "my-alb-999999999.us-west-1.elb.amazonaws.com"
+    ],
+    "postman-token": [
+      "99999999-9999-9F9F-9F99-F9999F9999FF"
+    ],
+    "user-agent": [
+      "PostmanRuntime/9.99.9"
+    ],
+    "x-amzn-trace-id": [
+      "Root=9-999FF9FF-999FF99999FFF9F999F99FF9"
+    ],
+    "x-forwarded-for": [
+      "99.99.999.999"
+    ],
+    "x-forwarded-port": [
+      "9999"
+    ],
+    "x-forwarded-proto": [
+      "http"
+    ]
+  },
+  "body": "{\"woop\":\"doop\"}",
+  "isBase64Encoded": false
+}
