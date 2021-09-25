@@ -15,7 +15,7 @@ public class AWSLambdaCustomResponse {
     this.headers = null;
     this.multiValueHeaders = null;
     this.isBase64Encoded = false;
-    this.body = null;
+    this.body = "";
   }
 
   public int getStatusCode() {

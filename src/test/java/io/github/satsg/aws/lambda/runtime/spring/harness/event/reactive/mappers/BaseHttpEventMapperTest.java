@@ -205,9 +205,9 @@ abstract class BaseHttpEventMapperTest {
     }
 
     @Test
-    void bodyIsNullWhenNotPresent() {
+    void bodyIsEmptyWhenNotPresent() {
       AWSLambdaCustomResponse result = (AWSLambdaCustomResponse) getMapper().respond(response);
-      assertThat(result.getBody()).isNull();
+      assertThat(result.getBody()).isEmpty();
     }
   }
 

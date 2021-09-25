@@ -19,8 +19,8 @@ class AWSLambdaCustomResponseTest {
   }
 
   @Test
-  void bodyIsNull() {
-    assertThat(RESPONSE.getBody()).isNull();
+  void bodyIsEmpty() {
+    assertThat(RESPONSE.getBody()).isEmpty();
   }
 
   @Test
