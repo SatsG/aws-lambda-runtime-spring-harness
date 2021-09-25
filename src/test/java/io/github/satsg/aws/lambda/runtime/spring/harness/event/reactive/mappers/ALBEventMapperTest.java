@@ -1,24 +1,22 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-class APIGatewayV1EventMapperTest extends BaseHttpEventMapperTest {
+@ExtendWith(MockitoExtension.class)
+class ALBEventMapperTest extends BaseHttpEventMapperTest {
 
   @Nested
   class MatchesTest {
@@ -35,38 +33,21 @@ class APIGatewayV1EventMapperTest extends BaseHttpEventMapperTest {
     }
 
     @Test
-    void matchesWithoutVersionCorrectly() {
+    void incorrectMatchesFails() {
       Map<String, Object> event = minimalMatch();
-      event.remove("version");
-      assertThat(getMapper().matches(event)).isTrue();
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(InvalidMatches.class)
-    void incorrectMatchesFails(Map<String, Object> event) {
+      ((Map<String, Object>) event.get("requestContext")).remove("elb");
       assertThat(getMapper().matches(event)).isFalse();
     }
   }
 
   private static Map<String, Object> minimalMatch() {
-    return new HashMap<>(
-        Map.of(
-            "version",
-            "1.0",
-            "httpMethod",
-            "GET",
-            "path",
-            "/path",
-            "requestContext",
-            new HashMap<>(Map.of("httpMethod", "GET"))));
+    return new HashMap<>(Map.of("requestContext", new HashMap<>(Map.of("elb", Map.of()))));
   }
 
   @Override
   protected Map<String, Object> minimalEvent() {
     return new HashMap<>(
         Map.of(
-            "version",
-            "1.0",
             "body",
             "{\"property\":\"value\"}",
             "isBase64Encoded",
@@ -94,34 +75,11 @@ class APIGatewayV1EventMapperTest extends BaseHttpEventMapperTest {
                     "h3",
                     Collections.singletonList(null))),
             "requestContext",
-            new HashMap<>(Map.of("httpMethod", "GET", "requestId", "test-request-id"))));
+            new HashMap<>(Map.of("elb", Map.of()))));
   }
 
   @Override
   protected ReactiveEventMapper getMapper() {
-    return new APIGatewayV1EventMapper(
-        new DefaultDataBufferFactory(), new DefaultUriBuilderFactory());
-  }
-
-  static class InvalidMatches implements ArgumentsProvider {
-
-    @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext)
-        throws Exception {
-      Map<String, Object> withoutHttpMethod = minimalMatch();
-      withoutHttpMethod.remove("httpMethod");
-
-      Map<String, Object> withoutPath = minimalMatch();
-      withoutPath.remove("path");
-
-      Map<String, Object> withoutContext = minimalMatch();
-      withoutContext.remove("requestContext");
-
-      Map<String, Object> withoutContextHttpMethod = minimalMatch();
-      ((Map<String, Object>) withoutContextHttpMethod.get("requestContext")).remove("httpMethod");
-
-      return Stream.of(withoutHttpMethod, withoutPath, withoutContext, withoutContextHttpMethod)
-          .map(Arguments::of);
-    }
+    return new ALBEventMapper(new DefaultDataBufferFactory(), new DefaultUriBuilderFactory());
   }
 }

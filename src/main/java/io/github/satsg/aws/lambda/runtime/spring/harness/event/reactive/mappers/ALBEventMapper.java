@@ -1,9 +1,12 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaRuntime;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,10 +16,9 @@ import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
-public class APIGatewayV1EventMapper extends AbstractHttpEventMapper {
+public class ALBEventMapper extends AbstractHttpEventMapper {
 
-  public APIGatewayV1EventMapper(
-      DataBufferFactory dataBufferFactory, UriBuilderFactory uriBuilderFactory) {
+  public ALBEventMapper(DataBufferFactory dataBufferFactory, UriBuilderFactory uriBuilderFactory) {
     super(dataBufferFactory, uriBuilderFactory);
   }
 
@@ -25,12 +27,7 @@ public class APIGatewayV1EventMapper extends AbstractHttpEventMapper {
     try {
       Map<String, Object> eventMap = (Map<String, Object>) event;
       Map<String, Object> context = (Map<String, Object>) eventMap.get("requestContext");
-
-      return (eventMap.get("version") == null || eventMap.get("version").equals("1.0"))
-          && eventMap.get("httpMethod") != null
-          && eventMap.get("path") != null
-          && context != null
-          && context.get("httpMethod") != null;
+      return context.get("elb") != null;
     } catch (Exception e) {
       return false;
     }
@@ -40,9 +37,12 @@ public class APIGatewayV1EventMapper extends AbstractHttpEventMapper {
   public ServerHttpRequest compose(Object event, Map<String, List<String>> headers) {
     try {
       Map<String, Object> eventMap = (Map<String, Object>) event;
-      Map<String, Object> context = (Map<String, Object>) eventMap.get("requestContext");
 
-      String requestId = (String) context.get("requestId");
+      String requestId =
+          Optional.ofNullable(headers.get(AWSLambdaRuntime.LAMBDA_RUNTIME_REQUEST_ID_HEADER))
+              .flatMap(values -> values.stream().findFirst())
+              .orElse(UUID.randomUUID().toString());
+
       HttpMethod method = HttpMethod.resolve((String) eventMap.get("httpMethod"));
       String path = (String) eventMap.get("path");
 
@@ -65,7 +65,7 @@ public class APIGatewayV1EventMapper extends AbstractHttpEventMapper {
           requestHeaders,
           body);
     } catch (Exception e) {
-      throw new IllegalStateException("Unable to convert api gateway v1 event to a request", e);
+      throw new IllegalStateException("Unable to convert alb event to a request", e);
     }
   }
 }

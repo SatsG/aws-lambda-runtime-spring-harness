@@ -246,6 +246,9 @@ public class ApplicationContextTest {
         .withBean(HttpHandler.class, () -> (req, res) -> Mono.empty())
         .run(
             ctx -> {
+              assertThat(ctx).hasBean("albEventMapper");
+              assertThat(ctx).getBean("albEventMapper").isInstanceOf(ReactiveEventMapper.class);
+
               assertThat(ctx).hasBean("apiGatewayV1EventMapper");
               assertThat(ctx)
                   .getBean("apiGatewayV1EventMapper")
