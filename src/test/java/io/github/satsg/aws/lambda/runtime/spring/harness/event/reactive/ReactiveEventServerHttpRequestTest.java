@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.RequestPath;
@@ -43,7 +44,14 @@ class ReactiveEventServerHttpRequestTest {
                         "h3",
                         Collections.singletonList(null),
                         "h4",
-                        Arrays.asList("value1", "value2")))),
+                        Arrays.asList("value1", "value2"),
+                        "Cookie",
+                        Arrays.asList(
+                            null,
+                            "",
+                            "name1=value1",
+                            "name2=value2; name3=; name4=value4",
+                            "name5=")))),
             new byte[0]);
   }
 
@@ -87,5 +95,22 @@ class ReactiveEventServerHttpRequestTest {
   @Test
   void bodyIsCorrect() {
     assertThat(request.getBody().blockLast().asByteBuffer().array()).isEmpty();
+  }
+
+  @Test
+  void cookiesAreCorrect() {
+    assertThat(request.getCookies()).containsKey("name1");
+    assertThat(request.getCookies().get("name1"))
+        .containsExactly(new HttpCookie("name1", "value1"));
+    assertThat(request.getCookies()).containsKey("name2");
+    assertThat(request.getCookies().get("name2"))
+        .containsExactly(new HttpCookie("name2", "value2"));
+    assertThat(request.getCookies()).containsKey("name3");
+    assertThat(request.getCookies().get("name3")).containsExactly(new HttpCookie("name3", ""));
+    assertThat(request.getCookies()).containsKey("name4");
+    assertThat(request.getCookies().get("name4"))
+        .containsExactly(new HttpCookie("name4", "value4"));
+    assertThat(request.getCookies()).containsKey("name5");
+    assertThat(request.getCookies().get("name5")).containsExactly(new HttpCookie("name5", ""));
   }
 }
