@@ -2,6 +2,7 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -38,9 +39,9 @@ public class ReactiveEventServerHttpRequest implements ServerHttpRequest {
     this.uri = Objects.requireNonNull(uri);
     this.path = RequestPath.parse(uri, null);
     this.query = createQueryMap(uri);
-    this.cookies = new MultiValueMapAdapter<>(new HashMap<>());
     this.method = Objects.requireNonNull(method).toString();
     this.headers = Objects.requireNonNull(headers);
+    this.cookies = createCookieMap(headers.getValuesAsList(HttpHeaders.COOKIE));
     this.body = Objects.requireNonNull(body);
   }
 
@@ -91,6 +92,16 @@ public class ReactiveEventServerHttpRequest implements ServerHttpRequest {
           .map(params -> params.split("="))
           .forEach(pair -> result.add(pair[0], pair.length == 2 ? pair[1] : ""));
     }
+    return result;
+  }
+
+  private MultiValueMap<String, HttpCookie> createCookieMap(List<String> values) {
+    MultiValueMap<String, HttpCookie> result = new MultiValueMapAdapter<>(new HashMap<>());
+    values.stream()
+        .flatMap(value -> Stream.of(value.split("; ")))
+        .map(cookie -> cookie.split("="))
+        .forEach(
+            pair -> result.add(pair[0], new HttpCookie(pair[0], pair.length == 2 ? pair[1] : "")));
     return result;
   }
 }
