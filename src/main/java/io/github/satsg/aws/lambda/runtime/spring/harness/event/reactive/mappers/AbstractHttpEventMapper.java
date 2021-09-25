@@ -42,6 +42,7 @@ public abstract class AbstractHttpEventMapper implements ReactiveEventMapper {
         }
       }
       awsResponse.setHeaders(result.getHeaders().toSingleValueMap());
+      awsResponse.setMultiValueHeaders(response.getHeaders());
       awsResponse.setIsBase64Encoded(false);
       return awsResponse;
     } catch (Exception e) {
