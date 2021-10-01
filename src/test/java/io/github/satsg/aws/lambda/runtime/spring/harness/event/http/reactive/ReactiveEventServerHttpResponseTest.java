@@ -32,6 +32,21 @@ class ReactiveEventServerHttpResponseTest {
   }
 
   @Test
+  void cookiesAreNotNull() {
+    assertThat(response.getCookies()).isNotNull();
+  }
+
+  @Test
+  void headersAreNotNull() {
+    assertThat(response.getHeaders()).isNotNull();
+  }
+
+  @Test
+  void actionsAreNotNull() {
+    assertThat(response.getActions()).isNotNull();
+  }
+
+  @Test
   void ableToAddHeader() {
     response.getHeaders().add("h1", "value1");
     assertThat(response.getHeaders()).containsKey("h1");

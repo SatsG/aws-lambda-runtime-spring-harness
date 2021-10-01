@@ -1,14 +1,10 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
