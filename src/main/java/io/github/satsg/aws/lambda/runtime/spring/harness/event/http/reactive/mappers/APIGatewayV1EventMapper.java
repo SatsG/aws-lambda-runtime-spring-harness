@@ -1,7 +1,6 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpRequest;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

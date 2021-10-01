@@ -3,13 +3,14 @@ package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ma
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpResponse;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriBuilderFactory;
@@ -34,15 +35,11 @@ public abstract class AbstractHttpEventMapper implements ReactiveEventMapper {
   public Object respond(ServerHttpResponse response) {
     try {
       ReactiveEventServerHttpResponse result = (ReactiveEventServerHttpResponse) response;
-      result.getActions().forEach(action -> action.get().block());
+      runActions(result);
+      appendCookiesToHeaders(result);
       AWSLambdaCustomResponse awsResponse = new AWSLambdaCustomResponse();
       awsResponse.setStatusCode(result.getStatusCode().value());
-      if (result.getBody() != null) {
-        ByteBuffer body = result.getBody().blockLast();
-        if (body != null) {
-          awsResponse.setBody(new String(body.array(), StandardCharsets.UTF_8));
-        }
-      }
+      setResponseBody(result, awsResponse);
       awsResponse.setHeaders(result.getHeaders().toSingleValueMap());
       awsResponse.setMultiValueHeaders(response.getHeaders());
       awsResponse.setIsBase64Encoded(false);
@@ -83,5 +80,27 @@ public abstract class AbstractHttpEventMapper implements ReactiveEventMapper {
           : String.valueOf(body).getBytes(StandardCharsets.UTF_8);
     }
     return new byte[0];
+  }
+
+  private void runActions(ReactiveEventServerHttpResponse response) {
+    response.getActions().forEach(action -> action.get().block());
+  }
+
+  private void appendCookiesToHeaders(ReactiveEventServerHttpResponse response) {
+    for (List<ResponseCookie> cookies : response.getCookies().values()) {
+      for (ResponseCookie cookie : cookies) {
+        response.getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
+      }
+    }
+  }
+
+  private void setResponseBody(
+      ReactiveEventServerHttpResponse reactive, AWSLambdaCustomResponse aws) {
+    if (reactive.getBody() != null) {
+      ByteBuffer body = reactive.getBody().blockLast();
+      if (body != null) {
+        aws.setBody(new String(body.array(), StandardCharsets.UTF_8));
+      }
+    }
   }
 }

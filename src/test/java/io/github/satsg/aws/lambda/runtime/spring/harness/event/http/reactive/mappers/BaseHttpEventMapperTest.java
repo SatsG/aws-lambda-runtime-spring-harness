@@ -7,7 +7,6 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomRe
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpRequest;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpResponse;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.BeforeEach;
@@ -154,7 +152,8 @@ abstract class BaseHttpEventMapperTest {
 
     @Test
     void isReactiveEventServerHttpResponse() {
-      Assertions.assertThat(getMapper().create()).isInstanceOf(ReactiveEventServerHttpResponse.class);
+      Assertions.assertThat(getMapper().create())
+          .isInstanceOf(ReactiveEventServerHttpResponse.class);
     }
   }
 
@@ -170,6 +169,7 @@ abstract class BaseHttpEventMapperTest {
           .willReturn(
               new HttpHeaders(
                   new MultiValueMapAdapter<>(Map.of("h1", Collections.singletonList("value1")))));
+      given(response.getCookies()).willReturn(new MultiValueMapAdapter<>(new HashMap<>()));
     }
 
     @Test
