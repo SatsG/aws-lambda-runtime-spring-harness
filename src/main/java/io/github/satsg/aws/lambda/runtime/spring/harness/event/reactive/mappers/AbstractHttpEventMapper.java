@@ -33,6 +33,7 @@ public abstract class AbstractHttpEventMapper implements ReactiveEventMapper {
   public Object respond(ServerHttpResponse response) {
     try {
       ReactiveEventServerHttpResponse result = (ReactiveEventServerHttpResponse) response;
+      result.getActions().forEach(action -> action.get().block());
       AWSLambdaCustomResponse awsResponse = new AWSLambdaCustomResponse();
       awsResponse.setStatusCode(result.getStatusCode().value());
       if (result.getBody() != null) {
