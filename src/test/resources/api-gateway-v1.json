@@ -65,16 +65,17 @@
     ]
   },
   "queryStringParameters": {
-    "twitch": "",
-    "youtube": "UC-hM6YJuNYVAmUWxeIr9FeA",
-    "twitter": null
+    "twitch": "my-channel",
+    "youtube": "UC-hM6YJuNJJbxmplHYosFVYQ",
+    "twitter": "",
+    "vimeo": null
   },
   "multiValueQueryStringParameters": {
     "twitch": [
       ""
     ],
     "youtube": [
-      "UC-hM6YJuNYVAmUWxeIr9FeA"
+      "UC-hM6YJuNJJbxmplHYosFVYQ"
     ]
   },
   "pathParameters": null,

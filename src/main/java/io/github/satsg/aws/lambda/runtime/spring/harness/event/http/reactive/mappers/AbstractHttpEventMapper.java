@@ -1,8 +1,9 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpResponse;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpResponse;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

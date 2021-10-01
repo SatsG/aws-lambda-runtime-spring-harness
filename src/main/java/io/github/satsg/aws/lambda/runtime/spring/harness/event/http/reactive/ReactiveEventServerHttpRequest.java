@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive;
 
 import java.net.URI;
 import java.util.HashMap;

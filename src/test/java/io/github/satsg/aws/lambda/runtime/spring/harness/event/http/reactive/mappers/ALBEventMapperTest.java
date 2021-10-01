@@ -1,13 +1,15 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,20 +25,20 @@ class ALBEventMapperTest extends BaseHttpEventMapperTest {
 
     @Test
     void doesNotMatchIfEventIsNotMapType() {
-      assertThat(getMapper().matches(new ArrayList<>())).isFalse();
+      Assertions.assertThat(getMapper().matches(new ArrayList<>())).isFalse();
     }
 
     @Test
     void matchesCorrectly() {
       Map<String, Object> event = minimalMatch();
-      assertThat(getMapper().matches(event)).isTrue();
+      Assertions.assertThat(getMapper().matches(event)).isTrue();
     }
 
     @Test
     void incorrectMatchesFails() {
       Map<String, Object> event = minimalMatch();
       ((Map<String, Object>) event.get("requestContext")).remove("elb");
-      assertThat(getMapper().matches(event)).isFalse();
+      Assertions.assertThat(getMapper().matches(event)).isFalse();
     }
   }
 
