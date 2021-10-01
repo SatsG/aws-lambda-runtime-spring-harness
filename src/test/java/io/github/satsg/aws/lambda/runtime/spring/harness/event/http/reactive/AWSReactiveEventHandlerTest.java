@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
