@@ -5,8 +5,8 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.models.FunctionOutput;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.function.context.FunctionalSpringApplication;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class TestFunctionalApplication {
 
   public static void main(String... args) {
-    FunctionalSpringApplication.run(TestFunctionalApplication.class, args);
+    SpringApplication.run(TestFunctionalApplication.class, args);
   }
 
   @Bean
