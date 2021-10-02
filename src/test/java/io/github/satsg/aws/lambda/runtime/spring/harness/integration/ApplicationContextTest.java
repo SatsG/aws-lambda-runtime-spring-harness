@@ -19,7 +19,7 @@ import io.github.satsg.aws.lambda.runtime.spring.harness.event.ServerlessEventLo
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionInputMapper;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionNameResolver;
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.functional.FunctionOutputMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.CommandLineRunner;

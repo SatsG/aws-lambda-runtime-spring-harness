@@ -1,10 +1,10 @@
 package io.github.satsg.aws.lambda.runtime.spring.harness.config;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSEventHandler;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.AWSReactiveEventHandler;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers.ALBEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers.APIGatewayV1EventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.AWSReactiveEventHandler;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers.ALBEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers.APIGatewayV1EventMapper;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.EventMatcher;
 import java.util.List;
