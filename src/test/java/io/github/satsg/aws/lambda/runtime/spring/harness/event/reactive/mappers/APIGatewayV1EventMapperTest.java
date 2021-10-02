@@ -1,8 +1,8 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

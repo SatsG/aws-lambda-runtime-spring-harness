@@ -1,4 +1,4 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

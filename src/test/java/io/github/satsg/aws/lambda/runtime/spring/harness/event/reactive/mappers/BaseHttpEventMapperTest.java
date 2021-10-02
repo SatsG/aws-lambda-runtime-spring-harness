@@ -1,12 +1,12 @@
-package io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.mappers;
+package io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import io.github.satsg.aws.lambda.runtime.spring.harness.event.AWSLambdaCustomResponse;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventMapper;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpRequest;
-import io.github.satsg.aws.lambda.runtime.spring.harness.event.http.reactive.ReactiveEventServerHttpResponse;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventMapper;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpRequest;
+import io.github.satsg.aws.lambda.runtime.spring.harness.event.reactive.ReactiveEventServerHttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
