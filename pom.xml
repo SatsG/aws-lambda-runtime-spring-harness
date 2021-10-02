@@ -38,9 +38,9 @@
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring-native.version>0.10.1</spring-native.version>
-        <spring-boot.version>2.5.2</spring-boot.version>
-        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <spring-native.version>0.10.4</spring-native.version>
+        <spring-boot.version>2.5.5</spring-boot.version>
+        <spring-cloud.version>2020.0.4</spring-cloud.version>
         <junit.version>5.7.2</junit.version>
         <spotless.version>2.11.1</spotless.version>
     </properties>
